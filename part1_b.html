@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>assignement</title>
+    <style>
+      body {
+        text-align: center;
+      }
+      div {
+        display: inline-block;
+      }
+      button {
+        display: inline-block;
+        padding: 10px 20px;
+      }
+      #table {
+        display: block;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="file" id="uploadfile" accept=".csv" />
+    <button id="uploadconfirm">Upload</button>
+
+    <br /><br /><br />
+    <table class="tablemanager">
+      <thead>
+        <tr>
+          <th>name</th>
+          <th>batch</th>
+          <th>stock</th>
+          <th>deal</th>
+          <th>free</th>
+          <th>mrp</th>
+          <th>rate</th>
+          <th>expiry</th>
+        </tr>
+      </thead>
+      <tbody id="body"></tbody>
+    </table>
+
+    <h1>the adreegated output is</h1>
+
+    <table class="tablemanager1">
+      <thead>
+        <tr>
+          <th>name</th>
+          <th>batch</th>
+          <th>stock</th>
+          <th>deal</th>
+          <th>free</th>
+          <th>mrp</th>
+          <th>rate</th>
+          <th>expiry</th>
+        </tr>
+      </thead>
+      <tbody id="body1"></tbody>
+    </table>
+
+    <br /><br />
+    <h2>batch wise output</h2>
+    <input type="text" id="domTextElement" />
+
+    <button type="button" onclick="getValueInput()">click me!!</button>
+
+    <br />
+    <table class="tablemanager2">
+      <thead>
+        <tr>
+          <th>name</th>
+          <th>batch</th>
+          <th>stock</th>
+          <th>deal</th>
+          <th>free</th>
+          <th>mrp</th>
+          <th>rate</th>
+          <th>expiry</th>
+        </tr>
+      </thead>
+      <tbody id="body2"></tbody>
+    </table>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="tablemanager.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
+    <script>
+      const Astock = [];
+      const Aname = [];
+      var A1stock = 0;
+      const Adeal = [];
+      const Abatch = [];
+      var A1deal = 0;
+      const Afree = [];
+      var A1free = 0;
+      const Amrp = [];
+      var A1mrp = 0;
+      const Arate = [];
+      var A1rate = 0;
+      const Aexpirydate = [];
+
+      const uploadconfirm = document
+        .getElementById("uploadconfirm")
+        .addEventListener("click", () => {
+          Papa.parse(document.getElementById("uploadfile").files[0], {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function (results) {
+              console.log("Upload and fetching successful");
+
+              //displaying the table
+              for (i = 0; i < results.data.length; i++) {
+                $("#body").append(`
+                            <tr>
+                                <td>${results.data[i].name}</td>
+                                <td>${results.data[i].batch}</td>
+                                <td>${results.data[i].stock}</td>
+                                <td>${results.data[i].deal}</td>
+                                <td>${results.data[i].free}</td>
+                                <td>${results.data[i].mrp}</td>
+                                <td>${results.data[i].rate}</td>
+                                <td>${results.data[i].exp}</td>
+                
+                             </tr>
+                        `);
+              }
+
+              for (i = 0; i < results.data.length; i++) {
+                Aname.push(results.data[i].name);
+                Astock.push(results.data[i].stock);
+                Adeal.push(results.data[i].deal);
+                Abatch.push(results.data[i].batch);
+                Afree.push(results.data[i].free);
+                Amrp.push(results.data[i].mrp);
+                Arate.push(results.data[i].rate);
+                Aexpirydate.push(results.data[i].exp);
+              }
+
+              console.log(Aexpirydate);
+              console.log(Aname);
+              const [first] = Aname;
+              console.log(first);
+
+              //check wether its number or not
+              function onlyNumbers(array) {
+                return array.every((element) => {
+                  return !isNaN(element);
+                });
+              }
+              console.log(Astock);
+              if (onlyNumbers(Astock) == true) {
+                Astock.forEach((x) => {
+                  x = Number(x);
+                  A1stock += x;
+                });
+                console.log("sum of stock is " + A1stock);
+              }
+
+              //maximum mrp in batch
+              A1mrp = Math.max(...Amrp);
+              console.log("maximum MRP in batch is" + A1mrp);
+              // maximum rate in batch
+
+              A1rate = Math.max(...Arate);
+
+              console.log("maximum rate in batch is" + A1rate);
+
+              // mimimum in free
+              A1free = Math.min(...Afree);
+
+              console.log("minimum free in batch is" + A1free);
+
+              // deal ratio
+
+              A1deal = Math.max(...Adeal);
+
+              console.log("deal ratio in batch is" + A1deal);
+
+              //exp date
+
+              var mnDate = Aexpirydate.reduce(function (a, b) {
+                return a < b ? a : b;
+              });
+
+              console.log(mnDate);
+              $("#body1").append(`
+                            <tr>
+                                <td>${first}</td>
+                                <td>${"All"}</td>
+                                <td>${A1stock}</td>
+                                <td>${A1deal}</td>
+                                <td>${A1free}</td>
+                                <td>${A1mrp}</td>
+                                <td>${A1rate}</td>
+                                <td>${mnDate}</td>
+                
+                             </tr>
+                        `);
+            },
+          });
+        });
+
+      const getValueInput = () => {
+        let inputValue = document.getElementById("domTextElement").value;
+        console.log(inputValue);
+
+        Papa.parse(document.getElementById("uploadfile").files[0], {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          complete: function (results) {
+            for (i = 0; i < results.data.length; i++) {
+              if (inputValue == results.data[i].batch) {
+                $("#body2").append(`
+                            <tr>
+                                <td>${results.data[i].name}</td>
+                                <td>${results.data[i].stock}</td>
+                                <td>${results.data[i].deal}</td>
+                                <td>${results.data[i].batch}</td>
+                                <td>${results.data[i].free}</td>
+                                <td>${results.data[i].mrp}</td>
+                                <td>${results.data[i].rate}</td>
+                                <td>${results.data[i].exp}</td>
+                             </tr>
+                        `);
+              }
+            }
+          },
+        });
+      };
+    </script>
+  </body>
+</html>

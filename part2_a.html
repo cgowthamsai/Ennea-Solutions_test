@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>assignement</title>
+    <style>
+      body {
+        text-align: center;
+      }
+      div {
+        display: inline-block;
+      }
+      button {
+        display: inline-block;
+        padding: 10px 20px;
+      }
+      #table {
+        display: block;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="file" id="uploadfile" accept=".csv" />
+    <button id="uploadconfirm">Upload</button>
+
+    <h2>Enter Company name</h2>
+    <input type="text" id="domTextElement" />
+    <button type="button" onclick="getValueInput()">Search Company</button>
+
+    <h1>
+      the data that is less than today are considered as expired and the date
+      that are greater are considered as not expired and the charts are
+      displayed below.
+    </h1>
+    <div id="piechart"></div>
+
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
+    <script>
+      const uploadconfirm = document
+        .getElementById("uploadconfirm")
+        .addEventListener("click", () => {
+          Papa.parse(document.getElementById("uploadfile").files[0], {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function (results) {
+              console.log("Upload and fetching successful");
+            },
+          });
+        });
+
+      const Adate = [];
+      const Aexp = [];
+      const nonExp = [];
+      const getValueInput = () => {
+        let inputValue = document.getElementById("domTextElement").value;
+        console.log(inputValue);
+        Papa.parse(document.getElementById("uploadfile").files[0], {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          complete: function (results) {
+            for (i = 0; i < results.data.length; i++) {
+              if (inputValue == results.data[i].company) {
+                Adate.push(results.data[i].exp);
+              }
+            }
+            var date = new Date();
+            let ms = date.getTime();
+            ms = ms.toString();
+            console.log("current date is" + ms);
+            for (i = 0; i < Adate.length; i++) {
+              Adate[i] = new Date(Adate[i]);
+              Adate[i] = Adate[i].getTime();
+              Adate[i] = Adate[i].toString();
+              var p1 = Adate[i];
+              if (p1 < ms) {
+                nonExp.push(Adate[i]);
+              } else {
+                Aexp.push(Adate[i]);
+              }
+            }
+            console.log("total count is " + Adate.length);
+            console.log("non exp " + nonExp);
+            console.log("non exp count " + nonExp.length);
+            console.log("exp is " + Aexp);
+            console.log("exp count" + Aexp.length);
+            // Load google charts
+            google.charts.load("current", { packages: ["corechart"] });
+            google.charts.setOnLoadCallback(drawChart);
+
+            // Draw the chart and set the chart values
+            function drawChart() {
+              var data = google.visualization.arrayToDataTable([
+                ["Task", "Expired vs NoN Expired"],
+                ["Non Expired", nonExp.length],
+                ["Expired", Aexp.length],
+              ]);
+
+              // Optional; add a title and set the width and height of the chart
+              var options = {
+                title: "Company Expired vs Non Expired",
+                width: 550,
+                height: 400,
+              };
+
+              // Display the chart inside the <div> element with id="piechart"
+              var chart = new google.visualization.PieChart(
+                document.getElementById("piechart")
+              );
+              chart.draw(data, options);
+            }
+          },
+        });
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>assignement</title>
+    <style>
+      body {
+        text-align: center;
+      }
+      div {
+        display: inline-block;
+      }
+      button {
+        display: inline-block;
+        padding: 10px 20px;
+      }
+      #table {
+        display: block;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="file" id="uploadfile" accept=".csv" />
+    <button id="uploadconfirm">Upload</button>
+
+    <h2>Enter Company name</h2>
+    <input type="text" id="domTextElement" />
+    <input type="date" id="myDate" />
+    <button type="button" onclick="getValueInput()">Search Company</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <canvas id="myChart" style="width: 100%"></canvas>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
+    <script>
+      const uploadconfirm = document
+        .getElementById("uploadconfirm")
+        .addEventListener("click", () => {
+          Papa.parse(document.getElementById("uploadfile").files[0], {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function (results) {
+              console.log("Upload and fetching successful");
+            },
+          });
+        });
+
+      const Adate = [];
+      const Aexp = [];
+      const Aexpp = [];
+      const Astock = [];
+      const Aname = [];
+      const nonExp = [];
+      const tt1 = [];
+      const pp1 = [];
+      const pp2 = [];
+      const getValueInput = () => {
+        let inputValue = document.getElementById("domTextElement").value;
+        let userdate = document.getElementById("myDate").value;
+        console.log(inputValue);
+        console.log(userdate);
+        Papa.parse(document.getElementById("uploadfile").files[0], {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          complete: function (results) {
+            for (i = 0; i < results.data.length; i++) {
+              if (inputValue == results.data[i].company) {
+                Adate.push(results.data[i].exp);
+                Aname.push(results.data[i].name);
+                Astock.push(results.data[i].stock);
+              }
+            }
+            console.log(Aname);
+            var date = new Date(userdate);
+            let ms = date.getTime();
+            ms = ms.toString();
+            console.log("current date is" + ms);
+            for (i = 0; i < Aname.length; i++) {
+              Adate[i] = new Date(Adate[i]);
+              Adate[i] = Adate[i].getTime();
+              Adate[i] = Adate[i].toString();
+              var p1 = Adate[i];
+              if (p1 < ms) {
+                nonExp.push(Adate[i]);
+              } else {
+                Aexp.push(Adate[i]);
+                Aexpp.push(Aname[i]);
+                tt1.push(Astock);
+              }
+            }
+            console.log(Aexp.length);
+            for (i = 0; i < Aexp.length; i++) {
+              console.log("expired are  " + Aexpp[i]);
+              pp1.push(tt1[i]);
+              pp2.push(Aexpp[i]);
+            }
+
+            var xValues = Aexpp;
+            var yValues = Astock;
+            var barColors = ["red", "green", "blue", "orange", "brown"];
+
+            new Chart("myChart", {
+              type: "bar",
+              data: {
+                labels: xValues,
+                datasets: [
+                  {
+                    backgroundColor: barColors,
+                    data: yValues,
+                  },
+                ],
+              },
+              options: {
+                legend: { display: false },
+                title: {
+                  display: true,
+                  text: "Expired are",
+                },
+              },
+            });
+          },
+        });
+      };
+    </script>
+  </body>
+</html>

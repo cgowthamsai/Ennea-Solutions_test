@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>assignement</title>
+    <style>
+      body {
+        text-align: center;
+      }
+      div {
+        display: inline-block;
+      }
+      button {
+        display: inline-block;
+        padding: 10px 20px;
+      }
+      #table {
+        display: block;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid black;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="file" id="uploadfile" accept=".csv" />
+    <button id="uploadconfirm">Upload</button>
+
+    <br /><br /><br />
+    <table class="tablemanager">
+      <thead>
+        <tr>
+          <th>name</th>
+          <th>batch</th>
+          <th>stock</th>
+          <th>deal</th>
+          <th>free</th>
+          <th>mrp</th>
+          <th>rate</th>
+          <th>expiry</th>
+          <th>company</th>
+        </tr>
+      </thead>
+      <tbody id="body"></tbody>
+    </table>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="tablemanager.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.1/papaparse.min.js"></script>
+    <script>
+      const uploadconfirm = document
+        .getElementById("uploadconfirm")
+        .addEventListener("click", () => {
+          Papa.parse(document.getElementById("uploadfile").files[0], {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function (results) {
+              console.log("Upload and fetching successful");
+
+              //displaying the table
+              for (i = 0; i < results.data.length; i++) {
+                $("#body").append(`
+                            <tr>
+                                <td>${results.data[i].name}</td>
+                                <td>${results.data[i].batch}</td>
+                                <td>${results.data[i].stock}</td>
+                                <td>${results.data[i].deal}</td>
+                                <td>${results.data[i].free}</td>
+                                <td>${results.data[i].mrp}</td>
+                                <td>${results.data[i].rate}</td>
+                                <td>${results.data[i].exp}</td>
+                                <td>${results.data[i].company}</td>
+                
+                             </tr>
+                        `);
+              }
+
+              $(".tablemanager").tablemanager({
+                firstSort: [
+                  [3, 0],
+                  [2, 0],
+                  [1, "asc"],
+                ],
+                disable: ["last"],
+                appendFilterby: true,
+                debug: true,
+                vocabulary: {
+                  voc_filter_by: "Filter By",
+                  voc_type_here_filter: "Filter...",
+                  voc_show_rows: "Rows Per Page",
+                },
+                pagination: true,
+                showrows: [20, 50, 100, 500, 1000],
+              });
+            },
+          });
+        });
+    </script>
+  </body>
+</html>
